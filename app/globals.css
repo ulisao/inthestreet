@@ -1,26 +1,193 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --negro: #0a0a0a;
+  --rojo: #ce1126;
+  --hueso: #f7f4ee;
+  --cheddar: #ffc629;
+  --celeste: #22a7e0;
+  --lechuga: #1fa97e;
+  --tinta: #141317;
+
+  --alto-barra-inferior: 88px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-negro: var(--negro);
+  --color-rojo: var(--rojo);
+  --color-hueso: var(--hueso);
+  --color-cheddar: var(--cheddar);
+  --color-celeste: var(--celeste);
+  --color-lechuga: var(--lechuga);
+  --color-tinta: var(--tinta);
+
+  --font-display: var(--font-big-shoulders), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-inter-tight), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background: var(--negro);
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--negro);
+    color: var(--hueso);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* La marca es de contorno grueso: nada de bordes tenues. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 0.9;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--cheddar);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* Elemento firma: palabra gigante en contorno, sin relleno, sobre la foto. */
+  .titular-outline {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-weight: 800;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--hueso);
+    paint-order: stroke fill;
+    transition: color 200ms ease, -webkit-text-stroke-color 200ms ease;
+  }
+
+  .titular-outline[data-relleno="true"] {
+    color: var(--rojo);
+    -webkit-text-stroke-color: var(--hueso);
+  }
+
+  .titular-outline-grueso {
+    -webkit-text-stroke-width: 3px;
+  }
+
+  /* Filetes verticales de 1px partiendo el hero en cuatro. */
+  .filetes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+      to right,
+      transparent calc(25% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(25% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(25% + 0.5px),
+      transparent calc(25% + 0.5px),
+      transparent calc(50% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(50% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(50% + 0.5px),
+      transparent calc(50% + 0.5px),
+      transparent calc(75% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(75% - 0.5px),
+      color-mix(in srgb, var(--hueso) 45%, transparent) calc(75% + 0.5px),
+      transparent calc(75% + 0.5px)
+    );
+  }
+
+  /* Chip de categoría: sticker die-cut, borde hueso grueso, sombra dura. */
+  .sticker {
+    border: 2px solid var(--hueso);
+    box-shadow: 3px 3px 0 var(--negro);
+    background: var(--tinta);
+    color: var(--hueso);
+    transition: transform 120ms ease, background-color 120ms ease,
+      color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .sticker[data-activo="true"] {
+    background: var(--rojo);
+    color: var(--hueso);
+    box-shadow: 3px 3px 0 var(--cheddar);
+  }
+
+  .sticker:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--negro);
+  }
+
+  /* Papel de deli a cuadros: fondo del detalle del pedido. */
+  .papel-deli {
+    background-color: var(--hueso);
+    background-image: repeating-linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--rojo) 14%, transparent) 0 1px,
+        transparent 1px 22px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--rojo) 14%, transparent) 0 1px,
+        transparent 1px 22px
+      );
+    color: var(--negro);
+  }
+
+  /* Borde de sticker die-cut para tarjetas. */
+  .borde-duro {
+    border: 2px solid var(--tinta);
+    box-shadow: 4px 4px 0 var(--tinta);
+  }
+
+  .barra-inferior {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@layer utilities {
+  .rot-1 {
+    transform: rotate(-1.5deg);
+  }
+  .rot-2 {
+    transform: rotate(1.5deg);
+  }
+  .rot-3 {
+    transform: rotate(-2.5deg);
+  }
+
+  .sin-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .sin-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
