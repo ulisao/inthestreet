@@ -91,28 +91,6 @@
     -webkit-text-stroke-width: 3px;
   }
 
-  /* Filetes verticales de 1px partiendo el hero en cuatro. */
-  .filetes {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: linear-gradient(
-      to right,
-      transparent calc(25% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(25% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(25% + 0.5px),
-      transparent calc(25% + 0.5px),
-      transparent calc(50% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(50% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(50% + 0.5px),
-      transparent calc(50% + 0.5px),
-      transparent calc(75% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(75% - 0.5px),
-      color-mix(in srgb, var(--hueso) 45%, transparent) calc(75% + 0.5px),
-      transparent calc(75% + 0.5px)
-    );
-  }
-
   /* Chip de categoría: sticker die-cut, borde hueso grueso, sombra dura. */
   .sticker {
     border: 2px solid var(--hueso);

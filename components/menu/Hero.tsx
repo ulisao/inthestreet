@@ -12,15 +12,17 @@ type Props = {
   puedeAgregar: boolean;
 };
 
-/** Hero: la foto más grande de la app, el titular en outline y los filetes verticales. Sin carrusel. */
+/** Hero: la foto más grande de la app con el titular en outline. Sin carrusel. */
 export function Hero({ producto, onPedir, puedeAgregar }: Props) {
   return (
     <section className="relative w-full overflow-hidden border-b-2 border-tinta aspect-4/5 sm:aspect-video">
       <FotoProducto producto={producto} className="absolute inset-0" />
-      <div className="filetes" />
       <div className="absolute inset-x-0 bottom-0 flex flex-col items-start gap-3 p-4 sm:p-8">
-        <TitularOutline as="h1" grueso className="text-[22vw] leading-[0.85] sm:text-8xl">
-          STREET
+        {/* El nombre completo, apilado: "IN THE STREET" en una sola línea
+            entraría tan chico que se perdería el gesto del contorno. */}
+        <TitularOutline as="h1" grueso className="text-[19vw] leading-[0.82] sm:text-8xl">
+          <span className="block">In the</span>
+          <span className="block">Street</span>
         </TitularOutline>
         <div className="flex flex-wrap items-center gap-3">
           <span className="sticker rot-2 px-3 py-2 font-display text-sm uppercase">

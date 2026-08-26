@@ -60,10 +60,13 @@ export function ABMProductos() {
         </button>
       </div>
 
-      {enEdicion !== null && categorias && (
+      {/* El alta va arriba, pegada al botón que la abre. La edición, en cambio,
+          reemplaza la fila del producto: si apareciera acá arriba, editar algo
+          del fondo de la lista parecería no haber hecho nada. */}
+      {enEdicion === "nuevo" && categorias && (
         <FormularioProducto
-          key={enEdicion === "nuevo" ? "nuevo" : productoEditado?._id}
-          producto={productoEditado}
+          key="nuevo"
+          producto={null}
           categorias={categorias}
           alGuardar={() => setEnEdicion(null)}
           alCancelar={() => setEnEdicion(null)}
@@ -76,42 +79,50 @@ export function ABMProductos() {
 
       <ul className="flex flex-col gap-2">
         {productos?.map((producto) => (
-          <li
-            key={producto._id}
-            className="borde-duro flex flex-wrap items-center gap-3 bg-tinta p-3 font-sans"
-          >
-            <div className="min-w-[160px] flex-1">
-              <p className="font-display text-lg uppercase leading-tight">
-                {producto.nombre}
-              </p>
-              <p className="text-xs text-hueso/60">{producto.categoriaSlug}</p>
-            </div>
-            <span className="font-display text-lg text-cheddar">
-              {precio(producto.precio)}
-            </span>
-            <button
-              type="button"
-              onClick={() => alternarDisponible(producto._id, producto.disponible)}
-              className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
-              data-activo={producto.disponible ? "true" : "false"}
-              aria-pressed={producto.disponible}
-            >
-              {producto.disponible ? "Disponible" : "Agotado"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setEnEdicion(producto._id)}
-              className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
-            >
-              Editar
-            </button>
-            <button
-              type="button"
-              onClick={() => eliminar(producto._id, producto.nombre)}
-              className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
-            >
-              Borrar
-            </button>
+          <li key={producto._id}>
+            {enEdicion === producto._id && categorias ? (
+              <FormularioProducto
+                producto={productoEditado}
+                categorias={categorias}
+                alGuardar={() => setEnEdicion(null)}
+                alCancelar={() => setEnEdicion(null)}
+              />
+            ) : (
+              <div className="borde-duro flex flex-wrap items-center gap-3 bg-tinta p-3 font-sans">
+                <div className="min-w-[160px] flex-1">
+                  <p className="font-display text-lg uppercase leading-tight">
+                    {producto.nombre}
+                  </p>
+                  <p className="text-xs text-hueso/60">{producto.categoriaSlug}</p>
+                </div>
+                <span className="font-display text-lg text-cheddar">
+                  {precio(producto.precio)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => alternarDisponible(producto._id, producto.disponible)}
+                  className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
+                  data-activo={producto.disponible ? "true" : "false"}
+                  aria-pressed={producto.disponible}
+                >
+                  {producto.disponible ? "Disponible" : "Agotado"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEnEdicion(producto._id)}
+                  className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => eliminar(producto._id, producto.nombre)}
+                  className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
+                >
+                  Borrar
+                </button>
+              </div>
+            )}
           </li>
         ))}
       </ul>

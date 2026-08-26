@@ -24,11 +24,6 @@ export function ABMOpciones() {
   );
   const [categoriaNueva, setCategoriaNueva] = useState("");
 
-  const opcionEditada =
-    enEdicion && enEdicion !== "nuevo"
-      ? opciones?.find((o) => o._id === enEdicion) ?? null
-      : null;
-
   const agrupadas = useMemo(() => {
     if (!opciones || !categorias) return [];
     return categorias.map((categoria) => ({
@@ -64,10 +59,12 @@ export function ABMOpciones() {
         </button>
       </div>
 
-      {enEdicion !== null && categorias && (
+      {/* Solo el alta va acá arriba. La edición reemplaza la fila de la opción:
+          si apareciera acá, editar algo del fondo parecería no hacer nada. */}
+      {enEdicion === "nuevo" && categorias && (
         <FormularioOpcion
-          key={enEdicion === "nuevo" ? "nuevo" : opcionEditada?._id}
-          opcion={opcionEditada}
+          key="nuevo"
+          opcion={null}
           categoriaSlugInicial={categoriaNueva}
           categorias={categorias}
           alGuardar={() => setEnEdicion(null)}
@@ -89,40 +86,49 @@ export function ABMOpciones() {
           )}
           <ul className="flex flex-col gap-2">
             {opcionesCategoria.map((opcion) => (
-              <li
-                key={opcion._id}
-                className="borde-duro flex flex-wrap items-center gap-3 bg-tinta p-3 font-sans text-sm"
-              >
-                <span className="bg-celeste px-2 py-0.5 font-display text-xs uppercase text-negro">
-                  {ETIQUETA_TIPO[opcion.tipo] ?? opcion.tipo}
-                </span>
-                <span className="min-w-[120px] flex-1 font-semibold">
-                  {opcion.nombre}
-                </span>
-                {!opcion.activa && (
-                  <span className="border-2 border-hueso/60 px-2 py-0.5 font-display text-xs uppercase text-hueso/60">
-                    No se ofrece
-                  </span>
+              <li key={opcion._id}>
+                {enEdicion === opcion._id && categorias ? (
+                  <FormularioOpcion
+                    opcion={opcion}
+                    categoriaSlugInicial={opcion.categoriaSlug}
+                    categorias={categorias}
+                    alGuardar={() => setEnEdicion(null)}
+                    alCancelar={() => setEnEdicion(null)}
+                  />
+                ) : (
+                  <div className="borde-duro flex flex-wrap items-center gap-3 bg-tinta p-3 font-sans text-sm">
+                    <span className="bg-celeste px-2 py-0.5 font-display text-xs uppercase text-negro">
+                      {ETIQUETA_TIPO[opcion.tipo] ?? opcion.tipo}
+                    </span>
+                    <span className="min-w-[120px] flex-1 font-semibold">
+                      {opcion.nombre}
+                    </span>
+                    {!opcion.activa && (
+                      <span className="border-2 border-hueso/60 px-2 py-0.5 font-display text-xs uppercase text-hueso/60">
+                        No se ofrece
+                      </span>
+                    )}
+                    {opcion.precio > 0 && (
+                      <span className="font-display text-cheddar">
+                        {precio(opcion.precio)}
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setEnEdicion(opcion._id)}
+                      className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => eliminar(opcion._id, opcion.nombre)}
+                      className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
+                    >
+                      Borrar
+                    </button>
+                  </div>
                 )}
-                {opcion.precio > 0 && (
-                  <span className="font-display text-cheddar">
-                    {precio(opcion.precio)}
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setEnEdicion(opcion._id)}
-                  className="sticker min-h-[44px] px-3 font-display text-xs uppercase"
-                >
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => eliminar(opcion._id, opcion.nombre)}
-                  className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
-                >
-                  Borrar
-                </button>
               </li>
             ))}
           </ul>

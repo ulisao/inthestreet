@@ -16,7 +16,6 @@ export function PromoDelDia({ promo }: { promo: Promo }) {
       aria-label="Promo del día"
       className="relative overflow-hidden border-y-2 border-tinta bg-rojo px-4 py-8"
     >
-      <div className="filetes" />
       <p className="mb-2 font-display text-xs uppercase tracking-[0.2em] text-hueso">
         Promo de hoy
       </p>
