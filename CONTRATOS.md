@@ -238,13 +238,13 @@ Cada subagente es **dueño exclusivo** de sus rutas. Nadie edita fuera de su dom
 
 ### Contrato entre catálogo y pedido
 
-`agente-pedido` expone el store y `agente-catalogo` lo consume. Firma acordada:
+El store del carrito **ya está escrito y congelado** en `lib/pedido/store.ts`. Nadie lo reescribe.
 
 ```ts
-// lib/pedido/store.ts  (dueño: agente-pedido)
+// lib/pedido/store.ts  — CONGELADO
 useCarrito(): {
   items: ItemCarrito[]
-  agregar(item: Omit<ItemCarrito, "lineaId">): void
+  agregar(item: Omit<ItemCarrito, "lineaId">): void   // el lineaId se calcula solo
   cambiarCantidad(lineaId: string, cantidad: number): void
   quitarLinea(lineaId: string): void
   vaciar(): void
@@ -254,11 +254,21 @@ useCarrito(): {
   abrirCarrito(): void
   cerrarCarrito(): void
 }
+
+useCarritoHidratado(): boolean
+// El store se hidrata desde localStorage. Hasta que devuelva true, no pintes
+// cantidades ni totales o Next tira error de hidratación.
+
+// lib/pedido/codigoGuardado.ts  — CONGELADO
+leerCodigos(): string[]        // del más nuevo al más viejo, máximo 10
+guardarCodigo(codigo: string): void
+ultimoCodigo(): string | null
 ```
 
 `agente-catalogo` importa `useCarrito` y llama `agregar` desde el bottom sheet del producto.
-`agente-pedido` es dueño del componente `<Carrito />` y de la barra fija inferior con el total.
-`agente-catalogo` renderiza `<Carrito />` en el layout de `app/(tienda)/`.
+`agente-pedido` es dueño del componente `<Carrito />` y de la barra fija inferior con el total,
+y los exporta desde `components/carrito/`.
+`agente-catalogo` los renderiza en el layout de `app/(tienda)/`.
 
 ---
 

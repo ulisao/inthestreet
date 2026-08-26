@@ -1,0 +1,42 @@
+/*
+ * Estilos propios del panel de cocina. No toca app/globals.css (congelado).
+ * Mismos tokens de marca, cero degradados, cero sombras suaves.
+ */
+
+/* Flash del borde de una comanda nueva. Es la única animación fuera del
+   relleno del titular — `prefers-reduced-motion` ya la neutraliza globalmente
+   (ver globals.css), así que además dejamos el sticker "NUEVO" fijo como
+   aviso estático que no depende de la animación. */
+@keyframes panel-flash-borde {
+  0%,
+  100% {
+    border-color: var(--tinta);
+    box-shadow: 4px 4px 0 var(--tinta);
+  }
+  50% {
+    border-color: var(--rojo);
+    box-shadow: 6px 6px 0 var(--rojo);
+  }
+}
+
+.panel-comanda--nueva {
+  animation: panel-flash-borde 0.7s ease-in-out 5;
+}
+
+.panel-comanda--vencida {
+  border-color: var(--rojo) !important;
+  box-shadow: 4px 4px 0 var(--rojo) !important;
+}
+
+/* Botones de comanda: bien por encima del mínimo de 44px táctiles. */
+.panel-boton-avanzar {
+  min-height: 64px;
+}
+
+.panel-boton-cancelar {
+  min-height: 48px;
+}
+
+.panel-boton-teclado {
+  min-height: 56px;
+}

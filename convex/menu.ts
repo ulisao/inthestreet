@@ -30,6 +30,18 @@ export const listarOpciones = query({
   },
 });
 
+/**
+ * Incluye las desactivadas. El panel necesita verlas para poder reactivarlas;
+ * con el listado filtrado, desmarcar "activa" las hacía desaparecer para siempre.
+ */
+export const listarOpcionesTodas = query({
+  args: {},
+  handler: async (ctx) => {
+    const opciones = await ctx.db.query("opciones").collect();
+    return opciones.sort((a, b) => a.orden - b.orden);
+  },
+});
+
 /** Todo lo que la tienda necesita para pintarse, en una sola subscripción. */
 export const menuCompleto = query({
   args: {},
