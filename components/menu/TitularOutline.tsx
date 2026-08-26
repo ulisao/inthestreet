@@ -49,17 +49,17 @@ export function TitularOutline({
   }
 
   return (
+    // Sin `tabIndex`: el relleno es decoración táctil, no un control. Un
+    // encabezado enfocable sería una parada de teclado que no hace nada, y son
+    // cinco en el menú. Como heading sigue siendo navegable por lector de pantalla.
     <Tag
       id={id}
-      tabIndex={0}
       className={clase}
       data-relleno={relleno ? "true" : undefined}
       onPointerDown={() => setRelleno(true)}
       onPointerUp={() => setRelleno(false)}
       onPointerLeave={() => setRelleno(false)}
       onPointerCancel={() => setRelleno(false)}
-      onFocus={() => setRelleno(true)}
-      onBlur={() => setRelleno(false)}
     >
       {children}
     </Tag>

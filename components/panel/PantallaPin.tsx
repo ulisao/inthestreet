@@ -144,7 +144,7 @@ export function PantallaPin() {
         </div>
 
         {error && (
-          <p role="alert" className="text-center font-sans font-semibold text-rojo">
+          <p role="alert" className="border-2 border-hueso bg-rojo px-3 py-2 text-center font-sans font-semibold text-hueso">
             {error}
           </p>
         )}

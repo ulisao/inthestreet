@@ -69,7 +69,7 @@ export function BarraPanel() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="sticker shrink-0 px-4 py-2 font-display text-sm uppercase tracking-wide"
+                className="sticker flex min-h-[44px] shrink-0 items-center px-4 py-2 font-display text-sm uppercase tracking-wide"
                 data-activo={activa ? "true" : "false"}
               >
                 {item.etiqueta}

@@ -45,7 +45,7 @@ export function BuscarCodigo() {
             placeholder="A-47"
             value={valor}
             onChange={(evento) => setValor(evento.target.value.toUpperCase())}
-            className="borde-duro min-h-11 flex-1 bg-negro px-3 font-display text-xl uppercase text-hueso placeholder:text-hueso/40"
+            className="borde-duro min-h-11 flex-1 bg-negro px-3 font-display text-xl uppercase text-hueso placeholder:text-hueso/60"
           />
           <button
             type="submit"

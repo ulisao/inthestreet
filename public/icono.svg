@@ -1,0 +1,21 @@
+<!-- Favicon: el sticker die-cut reducido a lo que todavía se lee a 16px.
+     Menos detalle que logo.svg a propósito: a ese tamaño el medallón y las
+     ruedas se empastan. Queda el anillo hueso, el campo rojo y la silueta
+     de la hamburguesa sobre la tabla. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IN THE STREET">
+  <rect width="64" height="64" fill="#0A0A0A"/>
+  <circle cx="32" cy="32" r="30" fill="#F7F4EE"/>
+  <circle cx="32" cy="32" r="26" fill="#CE1126"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#0A0A0A" stroke-width="3"/>
+
+  <g stroke="#0A0A0A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <!-- pan superior -->
+    <path d="M17 27c0-8 7-13 15-13s15 5 15 13z" fill="#E8A33D"/>
+    <!-- cheddar -->
+    <path d="M16 27h32v4c-3 0-3 4-8 4s-5-4-8-4-3 4-8 4-5-4-8-4z" fill="#FFC629"/>
+    <!-- pan inferior -->
+    <path d="M18 36h28a3 3 0 0 1 0 8H18a4 4 0 0 1 0-8z" fill="#E8A33D"/>
+    <!-- patineta -->
+    <path d="M12 47h40a2.5 2.5 0 0 1 0 5H12a2.5 2.5 0 0 1 0-5z" fill="#22A7E0"/>
+  </g>
+</svg>

@@ -141,7 +141,11 @@ export function FotoProducto({ producto, className = "" }: Props) {
   return (
     <div
       aria-hidden="true"
-      className={`relative overflow-hidden ${className}`}
+      // Sin `relative` acá: los tres llamadores pasan `absolute inset-0`, y
+      // como Tailwind emite `.relative` después de `.absolute`, el `relative`
+      // hardcodeado ganaba y el placeholder quedaba con alto 0 — o sea,
+      // ninguna foto de producto se veía en toda la app.
+      className={`overflow-hidden ${className}`}
       style={{
         backgroundColor: campo,
         // Rayado plano a 45°, sin degradado real: son bandas duras (mismo truco que .filetes).

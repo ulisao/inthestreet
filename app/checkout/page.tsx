@@ -7,8 +7,9 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useCarrito, useCarritoHidratado } from "@/lib/pedido/store";
 import { guardarCodigo } from "@/lib/pedido/codigoGuardado";
-import { precio } from "@/lib/formato";
+import { normalizarTelefono, precio } from "@/lib/formato";
 import { estadoApertura } from "@/lib/horario";
+import { useEnLinea } from "@/lib/pwa/useEnLinea";
 import {
   FORMULARIO_VACIO,
   traducirErrorPedido,
@@ -17,7 +18,7 @@ import {
 } from "@/lib/pedido/validacion";
 
 function claseCampo(conError: boolean) {
-  return `w-full min-h-11 border-2 bg-tinta px-3 py-3 text-hueso placeholder:text-hueso/40 focus-visible:outline-cheddar ${
+  return `w-full min-h-11 border-2 bg-tinta px-3 py-3 text-hueso placeholder:text-hueso/60 focus-visible:outline-cheddar ${
     conError ? "border-rojo" : "border-hueso"
   }`;
 }
@@ -30,6 +31,7 @@ export default function PaginaCheckout() {
   const eta = useQuery(api.pedidos.eta);
   const crearPedido = useMutation(api.pedidos.crear);
   const router = useRouter();
+  const enLinea = useEnLinea();
 
   const [form, setForm] = useState<FormularioCheckout>(FORMULARIO_VACIO);
   const [tocado, setTocado] = useState<Record<string, boolean>>({});
@@ -44,7 +46,13 @@ export default function PaginaCheckout() {
   const total = subtotal + recargoDelivery;
 
   const estado = config ? estadoApertura(config) : null;
-  const localCerrado = !config || config.pausado || !estado?.abierto;
+  // Tres cosas distintas que antes se decían todas como "cerrado": todavía no
+  // llegó la respuesta del local, el local está cerrado, o no hay internet.
+  // Decir "cerrado" cuando en realidad estamos esperando la config hace que
+  // alguien se vaya creyendo que el local no atiende.
+  const esperandoAlLocal = config === undefined;
+  const localCerrado = Boolean(config) && (config!.pausado || !estado?.abierto);
+  const puedeConfirmar = enLinea && !esperandoAlLocal && !localCerrado;
 
   const pagaConCrudo = form.pagaConTexto.trim();
   const pagaConNumero = pagaConCrudo === "" ? null : Number(pagaConCrudo);
@@ -91,6 +99,16 @@ export default function PaginaCheckout() {
     setIntentoEnvio(true);
     setErrorGeneral(null);
 
+    // Sin red, Convex no falla: deja la mutation encolada esperando reconectar.
+    // Eso es justo el bug que la app vino a arreglar (un pedido que la cocina
+    // nunca ve), así que acá cortamos antes y lo decimos.
+    if (!enLinea) {
+      setErrorGeneral(
+        "Te quedaste sin internet. No mandamos el pedido a la cocina hasta estar seguros de que llega: tu pedido queda armado, confirmalo apenas vuelva la señal.",
+      );
+      return;
+    }
+
     const { errores: erroresValidacion, datos } = validarFormulario(form, total);
     setErrores(erroresValidacion);
     if (!datos || !config || localCerrado || enviando) return;
@@ -99,7 +117,9 @@ export default function PaginaCheckout() {
     try {
       const resultado = await crearPedido({
         nombre: datos.nombre,
-        telefono: datos.telefono,
+        // Normalizado, no crudo: si no, la cocina recibe cada teléfono en un
+        // formato distinto según cómo lo haya tipeado cada cliente.
+        telefono: normalizarTelefono(datos.telefono),
         modalidad: datos.modalidad,
         direccion: datos.modalidad === "delivery" ? datos.direccion : undefined,
         referencia:
@@ -155,7 +175,10 @@ export default function PaginaCheckout() {
   return (
     <main className="mx-auto flex w-full max-w-md flex-col gap-4 px-4 pb-40 pt-4">
       <div className="flex items-center justify-between">
-        <Link href="/" className="text-sm text-hueso/70 underline">
+        <Link
+          href="/"
+          className="inline-flex min-h-11 items-center text-sm text-hueso/70 underline"
+        >
           ‹ Volver al menú
         </Link>
       </div>
@@ -170,7 +193,7 @@ export default function PaginaCheckout() {
           <p className="mt-1 text-sm text-hueso">
             {config.pausado ? config.mensajePausa : estado?.proximaApertura}
           </p>
-          <p className="mt-2 text-sm text-hueso/80">
+          <p className="mt-2 text-sm text-hueso">
             Podés dejar el pedido armado, pero todavía no lo vamos a poder confirmar.
           </p>
         </div>
@@ -254,7 +277,7 @@ export default function PaginaCheckout() {
             className={claseCampo(Boolean(errorVisible("nombre")))}
           />
           {errorVisible("nombre") && (
-            <p id="nombre-error" role="alert" className="text-sm font-semibold text-rojo">
+            <p id="nombre-error" role="alert" className="border-l-4 border-rojo pl-2 text-sm font-semibold text-hueso">
               {errores.nombre}
             </p>
           )}
@@ -278,7 +301,7 @@ export default function PaginaCheckout() {
             className={claseCampo(Boolean(errorVisible("telefono")))}
           />
           {errorVisible("telefono") && (
-            <p id="telefono-error" role="alert" className="text-sm font-semibold text-rojo">
+            <p id="telefono-error" role="alert" className="border-l-4 border-rojo pl-2 text-sm font-semibold text-hueso">
               {errores.telefono}
             </p>
           )}
@@ -327,7 +350,7 @@ export default function PaginaCheckout() {
                 className={claseCampo(Boolean(errorVisible("direccion")))}
               />
               {errorVisible("direccion") && (
-                <p id="direccion-error" role="alert" className="text-sm font-semibold text-rojo">
+                <p id="direccion-error" role="alert" className="border-l-4 border-rojo pl-2 text-sm font-semibold text-hueso">
                   {errores.direccion}
                 </p>
               )}
@@ -421,7 +444,7 @@ export default function PaginaCheckout() {
             />
             <div id="pagaCon-ayuda" aria-live="polite">
               {pagaConCrudo !== "" && !pagaConValido && (
-                <p className="text-sm font-semibold text-rojo">
+                <p className="border-l-4 border-rojo pl-2 text-sm font-semibold text-hueso">
                   Poné solo números para calcular el vuelto.
                 </p>
               )}
@@ -431,7 +454,7 @@ export default function PaginaCheckout() {
                     Vuelto: {precio(vuelto)}
                   </p>
                 ) : (
-                  <p className="text-sm font-semibold text-rojo">
+                  <p className="border-l-4 border-rojo pl-2 text-sm font-semibold text-hueso">
                     Con ese billete no alcanza. Faltan {precio(Math.abs(vuelto))}.
                   </p>
                 ))}
@@ -456,22 +479,26 @@ export default function PaginaCheckout() {
 
       <div className="fixed inset-x-0 bottom-0 z-20 barra-inferior bg-negro px-4 pt-3">
         {errorGeneral && (
-          <p role="alert" className="mb-2 text-sm font-semibold text-rojo">
+          <p role="alert" className="mb-2 border-2 border-hueso bg-rojo px-3 py-2 text-sm font-semibold text-hueso">
             {errorGeneral}
           </p>
         )}
         <button
           type="submit"
           form="form-checkout"
-          disabled={enviando || localCerrado}
+          disabled={enviando || !puedeConfirmar}
           data-activo="true"
           className="sticker min-h-11 w-full py-3 font-display text-lg uppercase disabled:opacity-40"
         >
           {enviando
             ? "Mandando el pedido…"
-            : localCerrado
-              ? `Cerrado por ahora · ${precio(total)}`
-              : `Confirmar pedido · ${precio(total)}`}
+            : !enLinea
+              ? `Sin internet · ${precio(total)}`
+              : esperandoAlLocal
+                ? `Conectando con el local · ${precio(total)}`
+                : localCerrado
+                  ? `Cerrado por ahora · ${precio(total)}`
+                  : `Confirmar pedido · ${precio(total)}`}
         </button>
       </div>
     </main>

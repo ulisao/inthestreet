@@ -90,7 +90,7 @@ function FormularioPromo({
       </label>
 
       {error && (
-        <p role="alert" className="font-semibold text-rojo">
+        <p role="alert" className="border-2 border-hueso bg-rojo px-3 py-2 font-semibold text-hueso">
           {error}
         </p>
       )}
@@ -186,7 +186,7 @@ export function ABMPromos() {
                         </p>
                       )}
                       {!promo.activa && (
-                        <p className="text-xs uppercase text-rojo">Inactiva</p>
+                        <p className="inline-block bg-rojo px-2 py-0.5 text-xs uppercase text-hueso">Inactiva</p>
                       )}
                     </>
                   ) : (
@@ -204,7 +204,7 @@ export function ABMPromos() {
                   <button
                     type="button"
                     onClick={() => eliminar(promo._id, promo.titulo)}
-                    className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-rojo"
+                    className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
                   >
                     Borrar
                   </button>

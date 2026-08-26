@@ -175,7 +175,7 @@ export function FormularioProducto({
       </div>
 
       {error && (
-        <p role="alert" className="font-semibold text-rojo">
+        <p role="alert" className="border-2 border-hueso bg-rojo px-3 py-2 font-semibold text-hueso">
           {error}
         </p>
       )}

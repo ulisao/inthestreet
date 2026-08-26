@@ -1,0 +1,44 @@
+{
+  "name": "IN THE STREET — Hamburguesas y lomos en Marcos Juárez",
+  "short_name": "IN THE STREET",
+  "description": "Pedí online y seguí tu pedido en vivo. Hamburguesas y lomos, retiro por el local o delivery en todo Marcos Juárez.",
+  "lang": "es-AR",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "categories": ["food", "shopping"],
+  "icons": [
+    {
+      "src": "/icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icono-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Seguí tu pedido",
+      "short_name": "Mi pedido",
+      "description": "Mirá cómo va el último pedido que hiciste.",
+      "url": "/pedido",
+      "icons": [{ "src": "/icono-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

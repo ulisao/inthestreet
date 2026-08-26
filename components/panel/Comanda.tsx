@@ -224,7 +224,7 @@ export function Comanda({
           type="button"
           onClick={cancelarPedido}
           disabled={enCurso}
-          className="panel-boton-cancelar border-2 border-rojo font-display text-sm uppercase text-rojo disabled:opacity-60"
+          className="panel-boton-cancelar border-2 border-rojo font-display text-sm uppercase text-hueso disabled:opacity-60"
         >
           Cancelar pedido
         </button>

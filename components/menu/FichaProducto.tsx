@@ -301,7 +301,7 @@ export function FichaProducto({
 
         <div className="barra-inferior sticky bottom-0 border-t-2 border-tinta bg-negro px-4 py-3">
           {!puedeAgregar && mensajeIndisponible && (
-            <p role="status" className="mb-2 text-center font-sans text-sm text-rojo">
+            <p role="status" className="mb-2 border-2 border-hueso bg-rojo px-3 py-2 text-center font-sans text-sm text-hueso">
               {mensajeIndisponible}
             </p>
           )}

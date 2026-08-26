@@ -18,9 +18,9 @@ export function TarjetaProducto({ producto, onAbrir }: Props) {
       type="button"
       disabled={agotado}
       onClick={(evento) => onAbrir(evento.currentTarget)}
-      aria-label={
-        agotado ? `${producto.nombre}. Agotado.` : `${producto.nombre}, ${precio(producto.precio)}`
-      }
+      // Sin aria-label a propósito: el nombre accesible sale del contenido
+      // visible del botón. Un aria-label más corto que el texto que se ve
+      // rompe "Label in Name" (WCAG 2.5.3) y lo marca axe.
       className={`borde-duro flex min-h-11 flex-col overflow-hidden bg-tinta text-left ${
         agotado ? "opacity-50" : "active:translate-x-[2px] active:translate-y-[2px]"
       }`}
@@ -29,7 +29,6 @@ export function TarjetaProducto({ producto, onAbrir }: Props) {
         <FotoProducto producto={producto} className="absolute inset-0" />
         {agotado && (
           <span
-            aria-hidden="true"
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 border-2 border-hueso bg-rojo px-3 py-1 font-display text-sm uppercase tracking-wider text-hueso"
           >
             Agotado

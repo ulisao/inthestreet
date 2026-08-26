@@ -144,6 +144,7 @@ Etiquetas de cara al cliente (exportadas en `types/index.ts` como `ETIQUETA_ESTA
 | `api.menu.listarProductos` | — | todos los productos, incluso no disponibles (para el panel) |
 | `api.menu.listarCategorias` | — | categorías activas |
 | `api.menu.listarOpciones` | — | opciones activas |
+| `api.menu.listarOpcionesTodas` | — | todas, incluidas las desactivadas (para el ABM del panel) |
 | `api.config.leerConfig` | — | `config_local`, con fallback a los valores iniciales si nadie corrió el seed |
 | `api.config.promoDeHoy` | `{ diaSemana: number }` | la promo del día o `null` |
 | `api.config.listarPromos` | — | todas las promos, ordenadas por día |
@@ -208,7 +209,7 @@ Generalo concatenando `productoId + puntoCoccion + extras ordenados + quitar ord
 
 ### `lib/formato.ts`
 - `precio(valor: number): string` — `12500` → `$12.500`. **Usala siempre, nunca formatees a mano.**
-- `normalizarTelefono(entrada)` / `telefonoValido(entrada)` — 10 u 11 dígitos, tolera `0`, `15`, guiones
+- `normalizarTelefono(entrada)` / `telefonoValido(entrada)` — 10 u 11 dígitos, tolera `+54`, el `9` de móvil, el `0` de larga distancia, el `15` (que va **después** de la característica) y guiones/paréntesis/espacios. El checkout guarda el teléfono **normalizado**, no lo que tipeó el cliente.
 - `minutosTranscurridos(desde, hasta?)` · `textoTranscurrido(desde)` → `"hace 12 min"`
 - `horaCorta(ts)` → `"20:45"` en hora Argentina
 

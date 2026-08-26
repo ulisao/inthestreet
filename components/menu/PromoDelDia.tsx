@@ -17,7 +17,7 @@ export function PromoDelDia({ promo }: { promo: Promo }) {
       className="relative overflow-hidden border-y-2 border-tinta bg-rojo px-4 py-8"
     >
       <div className="filetes" />
-      <p className="mb-2 font-display text-xs uppercase tracking-[0.2em] text-hueso/80">
+      <p className="mb-2 font-display text-xs uppercase tracking-[0.2em] text-hueso">
         Promo de hoy
       </p>
       <TitularOutline as="h2" grueso interactivo={false} className="mb-3 text-4xl sm:text-6xl">

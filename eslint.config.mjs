@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Codegen de Convex: el CLI reescribe estos archivos (con su propio
+    // /* eslint-disable */ arriba) cada vez que corre `convex dev`. Lintearlos
+    // deja un warning permanente que nadie puede arreglar.
+    "convex/_generated/**",
   ]),
 ]);
 

@@ -108,7 +108,7 @@ export function ABMProductos() {
             <button
               type="button"
               onClick={() => eliminar(producto._id, producto.nombre)}
-              className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-rojo"
+              className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
             >
               Borrar
             </button>

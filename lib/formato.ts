@@ -7,7 +7,29 @@ export function precio(valor: number) {
 
 /** Teléfono argentino: acepta 10 dígitos con o sin 0/15, guiones y espacios. */
 export function normalizarTelefono(entrada: string) {
-  return entrada.replace(/\D/g, "").replace(/^0/, "").replace(/^54/, "");
+  let digitos = entrada.replace(/\D/g, "");
+
+  // Prefijo país, y el 9 de móvil que va pegado atrás del 54.
+  if (digitos.startsWith("54")) {
+    digitos = digitos.slice(2);
+    if (digitos.startsWith("9")) digitos = digitos.slice(1);
+  }
+  digitos = digitos.replace(/^0/, "");
+
+  // El 15 va después de la característica (2 a 4 dígitos), no al principio:
+  // 3472 15 529023 → 3472529023.
+  if (digitos.length === 12) {
+    for (const largoCaracteristica of [4, 3, 2]) {
+      if (digitos.slice(largoCaracteristica, largoCaracteristica + 2) === "15") {
+        digitos =
+          digitos.slice(0, largoCaracteristica) +
+          digitos.slice(largoCaracteristica + 2);
+        break;
+      }
+    }
+  }
+
+  return digitos;
 }
 
 export function telefonoValido(entrada: string) {
@@ -29,10 +51,12 @@ export function textoTranscurrido(desde: number, hasta = Date.now()) {
   return `hace ${horas} h ${resto} min`;
 }
 
+/** `20:45`. Reloj de 24 horas: es como se habla la hora acá. */
 export function horaCorta(ts: number) {
   return new Date(ts).toLocaleTimeString("es-AR", {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
     timeZone: "America/Argentina/Buenos_Aires",
   });
 }

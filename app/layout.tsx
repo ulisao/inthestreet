@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Big_Shoulders, Inter_Tight } from "next/font/google";
 import { ProveedorConvex } from "@/components/ProveedorConvex";
+import { AvisoSinConexion } from "@/components/pwa/AvisoSinConexion";
+import { RegistroServiceWorker } from "@/components/pwa/RegistroServiceWorker";
 import "./globals.css";
 
 // Google renombró "Big Shoulders Display" a "Big Shoulders".
@@ -34,6 +36,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_AR",
+    // El link de la bio de Instagram apunta a la home: sin og:url, WhatsApp
+    // arma la preview con la URL cruda que le pegaron.
+    url: "/",
     siteName: "IN THE STREET",
     title: "IN THE STREET — Pedí online",
     description:
@@ -47,8 +52,20 @@ export const metadata: Metadata = {
     images: ["/og.png"],
   },
   icons: {
-    icon: "/icono.svg",
+    // El .ico vive en /public y no en app/: el pipeline de imágenes de
+    // Turbopack no decodifica ICO con payload PNG, y como archivo estático
+    // no necesita pasar por ahí. Los navegadores modernos usan el SVG.
+    icon: [
+      { url: "/icono.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "32x32" },
+    ],
     apple: "/icono-180.png",
+  },
+  other: {
+    // Next 16 emite el `mobile-web-app-capable` moderno. iOS todavía se guía
+    // por el prefijado, y sin él "Agregar a inicio" abre en Safari con barra
+    // de direcciones en vez de standalone.
+    "apple-mobile-web-app-capable": "yes",
   },
 };
 
@@ -67,6 +84,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${bigShoulders.variable} ${interTight.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-negro text-hueso">
+        <RegistroServiceWorker />
+        <AvisoSinConexion />
         <ProveedorConvex>{children}</ProveedorConvex>
       </body>
     </html>

@@ -64,16 +64,17 @@ export function Encabezado() {
       <div className="flex h-16 items-center justify-between gap-3 px-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.svg" alt="IN THE STREET" className="h-11 w-11 shrink-0" />
-        <span
-          role="status"
-          aria-live="polite"
-          data-activo={pausado ? "true" : undefined}
-          className={`sticker grid min-h-11 place-items-center px-3 py-1.5 font-display text-xs uppercase tracking-wide ${
-            estado.abierto && !pausado ? "bg-lechuga text-negro" : ""
-          }`}
-        >
-          {etiquetaEstado}
-        </span>
+        {/* El chip solo aparece cuando NO hay franja. Con franja decían lo
+            mismo dos veces y se comían 105px del alto en un teléfono de 390. */}
+        {!cerradoOPausado && (
+          <span
+            role="status"
+            aria-live="polite"
+            className="sticker grid min-h-11 place-items-center bg-lechuga px-3 py-1.5 font-display text-xs uppercase tracking-wide text-negro"
+          >
+            {etiquetaEstado}
+          </span>
+        )}
       </div>
     </header>
   );

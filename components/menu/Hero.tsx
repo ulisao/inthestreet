@@ -10,12 +10,10 @@ type Props = {
   onPedir: (disparador: HTMLElement) => void;
   /** false si el local está pausado o fuera de horario: el hero igual deja mirar el menú. */
   puedeAgregar: boolean;
-  /** Cuándo vuelve a abrir, o el mensaje de pausa. Solo se muestra si !puedeAgregar. */
-  mensajeIndisponible?: string;
 };
 
 /** Hero: la foto más grande de la app, el titular en outline y los filetes verticales. Sin carrusel. */
-export function Hero({ producto, onPedir, puedeAgregar, mensajeIndisponible }: Props) {
+export function Hero({ producto, onPedir, puedeAgregar }: Props) {
   return (
     <section className="relative w-full overflow-hidden border-b-2 border-tinta aspect-4/5 sm:aspect-video">
       <FotoProducto producto={producto} className="absolute inset-0" />
@@ -28,13 +26,13 @@ export function Hero({ producto, onPedir, puedeAgregar, mensajeIndisponible }: P
           <span className="sticker rot-2 px-3 py-2 font-display text-sm uppercase">
             {producto.nombre}
           </span>
-          <span className="font-display text-2xl text-cheddar">{precio(producto.precio)}</span>
+          {/* El precio va sobre campo negro y no suelto sobre la foto: cheddar
+              contra una foto clara (o contra el placeholder amarillo) queda
+              ilegible. Sobre tinta da 11,8:1. */}
+          <span className="sticker rot-1 px-3 py-2 font-display text-2xl leading-none text-cheddar">
+            {precio(producto.precio)}
+          </span>
         </div>
-        {!puedeAgregar && mensajeIndisponible && (
-          <p role="status" className="sticker rot-3 bg-rojo px-3 py-2 font-display text-xs uppercase text-hueso">
-            {mensajeIndisponible}
-          </p>
-        )}
         <button
           type="button"
           onClick={(evento) => onPedir(evento.currentTarget)}

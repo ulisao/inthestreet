@@ -99,6 +99,11 @@ export function ABMOpciones() {
                 <span className="min-w-[120px] flex-1 font-semibold">
                   {opcion.nombre}
                 </span>
+                {!opcion.activa && (
+                  <span className="border-2 border-hueso/60 px-2 py-0.5 font-display text-xs uppercase text-hueso/60">
+                    No se ofrece
+                  </span>
+                )}
                 {opcion.precio > 0 && (
                   <span className="font-display text-cheddar">
                     {precio(opcion.precio)}
@@ -114,7 +119,7 @@ export function ABMOpciones() {
                 <button
                   type="button"
                   onClick={() => eliminar(opcion._id, opcion.nombre)}
-                  className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-rojo"
+                  className="min-h-[44px] border-2 border-rojo px-3 font-display text-xs uppercase text-hueso"
                 >
                   Borrar
                 </button>
