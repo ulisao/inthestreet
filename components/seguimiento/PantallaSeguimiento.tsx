@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { guardarCodigo } from "@/lib/pedido/codigoGuardado";
-import { normalizarCodigo } from "./normalizarCodigo";
+import { armarReferencia, leerReferencia } from "@/lib/pedido/referencia";
 import { useReloj } from "./useReloj";
 import { EsqueletoSeguimiento } from "./EsqueletoSeguimiento";
 import { PedidoNoEncontrado } from "./PedidoNoEncontrado";
@@ -20,21 +20,36 @@ import { BotonWhatsapp } from "./BotonWhatsapp";
  * el tiempo transcurrido, no que refetchea datos.
  */
 export function PantallaSeguimiento({ codigo }: { codigo: string }) {
-  const codigoNormalizado = normalizarCodigo(codigo);
-  const datos = useQuery(api.pedidos.porCodigo, { codigo: codigoNormalizado });
+  // `codigo` puede venir como referencia completa (`A-47-260826`) o como el
+  // código corto suelto, si el cliente lo pegó a mano.
+  const referencia = leerReferencia(codigo);
+  const datos = useQuery(
+    api.pedidos.porCodigo,
+    referencia
+      ? { codigo: referencia.codigo, diaServicio: referencia.diaServicio }
+      : "skip",
+  );
   const ahora = useReloj();
 
-  const codigoEncontrado = datos?.pedido?.codigo;
+  const pedidoEncontrado = datos?.pedido;
   useEffect(() => {
-    if (codigoEncontrado) guardarCodigo(codigoEncontrado);
-  }, [codigoEncontrado]);
+    if (pedidoEncontrado?.diaServicio) {
+      guardarCodigo(
+        armarReferencia(pedidoEncontrado.codigo, pedidoEncontrado.diaServicio),
+      );
+    }
+  }, [pedidoEncontrado?.codigo, pedidoEncontrado?.diaServicio]);
+
+  if (!referencia) {
+    return <PedidoNoEncontrado codigoBuscado={codigo.toUpperCase()} />;
+  }
 
   if (datos === undefined) {
     return <EsqueletoSeguimiento />;
   }
 
   if (datos === null) {
-    return <PedidoNoEncontrado codigoBuscado={codigoNormalizado} />;
+    return <PedidoNoEncontrado codigoBuscado={referencia.codigo} />;
   }
 
   const { pedido, items, adelante, local } = datos;

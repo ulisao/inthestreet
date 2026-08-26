@@ -3,7 +3,7 @@ import { mutation, query } from "./_generated/server";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import { estadoPedido, metodoPago, modalidad } from "./schema";
 import { CONFIG_INICIAL } from "./datosIniciales";
-import { estaAbierto } from "../lib/horario";
+import { diaServicio as diaServicioActual, estaAbierto } from "../lib/horario";
 
 const ESTADOS_EN_COLA = ["recibido", "en_cocina"] as const;
 const ESTADOS_ACTIVOS = ["recibido", "en_cocina", "listo", "en_camino"] as const;
@@ -27,25 +27,34 @@ async function contarEnCola(ctx: QueryCtx | MutationCtx) {
   return enCola.flat().length;
 }
 
-async function generarCodigo(ctx: MutationCtx) {
-  for (let intento = 0; intento < 20; intento++) {
-    const letra = LETRAS[Math.floor(Math.random() * LETRAS.length)];
-    const numero = Math.floor(Math.random() * 90) + 10;
-    const codigo = `${letra}-${numero}`;
-    const existente = await ctx.db
-      .query("pedidos")
-      .withIndex("por_codigo", (q) => q.eq("codigo", codigo))
-      .first();
-    // Un código se puede reusar una vez que el pedido viejo se cerró.
-    if (
-      !existente ||
-      existente.estado === "entregado" ||
-      existente.estado === "cancelado"
-    ) {
-      if (!existente) return codigo;
+/**
+ * Un código solo tiene que ser único dentro de su noche: al día siguiente se
+ * recicla. Con 2160 combinaciones contra unas decenas de pedidos por noche, el
+ * pool nunca se llena y el código se mantiene corto para siempre.
+ *
+ * El día de servicio viaja aparte, en la referencia del link, así un código
+ * reciclado nunca resuelve al pedido de otra persona.
+ */
+async function generarCodigo(ctx: MutationCtx, dia: string) {
+  const deLaNoche = await ctx.db
+    .query("pedidos")
+    .withIndex("por_dia_codigo", (q) => q.eq("diaServicio", dia))
+    .collect();
+  const tomados = new Set(deLaNoche.map((pedido) => pedido.codigo));
+
+  const disponibles: string[] = [];
+  for (const letra of LETRAS) {
+    for (let numero = 10; numero < 100; numero++) {
+      const codigo = `${letra}-${numero}`;
+      if (!tomados.has(codigo)) disponibles.push(codigo);
     }
   }
-  return `Z-${Date.now().toString().slice(-4)}`;
+
+  // Solo pasa si una noche superara los 2160 pedidos. Con un código por
+  // milisegundo el desempate sigue siendo único dentro de la misma noche.
+  if (disponibles.length === 0) return `Z-${Date.now().toString().slice(-5)}`;
+
+  return disponibles[Math.floor(Math.random() * disponibles.length)];
 }
 
 export const eta = query({
@@ -63,11 +72,16 @@ export const eta = query({
 });
 
 export const porCodigo = query({
-  args: { codigo: v.string() },
-  handler: async (ctx, { codigo }) => {
+  // `diaServicio` viene del link; si el cliente pegó el código corto suelto,
+  // se resuelve contra la noche de hoy, que es cuando su pedido está vivo.
+  args: { codigo: v.string(), diaServicio: v.optional(v.string()) },
+  handler: async (ctx, { codigo, diaServicio }) => {
+    const dia = diaServicio ?? diaServicioActual();
     const pedido = await ctx.db
       .query("pedidos")
-      .withIndex("por_codigo", (q) => q.eq("codigo", codigo.toUpperCase()))
+      .withIndex("por_dia_codigo", (q) =>
+        q.eq("diaServicio", dia).eq("codigo", codigo.toUpperCase()),
+      )
       .first();
     if (!pedido) return null;
 
@@ -270,10 +284,12 @@ export const crear = mutation({
     }
 
     const enCola = await contarEnCola(ctx);
-    const codigo = await generarCodigo(ctx);
+    const dia = diaServicioActual();
+    const codigo = await generarCodigo(ctx, dia);
 
     const pedidoId = await ctx.db.insert("pedidos", {
       codigo,
+      diaServicio: dia,
       estado: "recibido",
       modalidad: args.modalidad,
       nombre: args.nombre.trim(),
@@ -296,7 +312,7 @@ export const crear = mutation({
       await ctx.db.insert("items_pedido", { pedidoId, ...linea });
     }
 
-    return { codigo, pedidoId };
+    return { codigo, diaServicio: dia, pedidoId };
   },
 });
 

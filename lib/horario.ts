@@ -1,6 +1,9 @@
 /** Argentina no tiene horario de verano: el offset es fijo. */
 const OFFSET_ARGENTINA_MIN = -180;
 
+/** A qué hora arranca un nuevo día de servicio. Ver `diaServicio`. */
+const CORTE_DIA_SERVICIO_H = 6;
+
 export type HorarioLocal = {
   diasAbiertos: number[];
   horaApertura: string;
@@ -37,6 +40,24 @@ export function ahoraEnArgentina(ts: number = Date.now()) {
     hora: desplazado.getUTCHours(),
     minuto: desplazado.getUTCMinutes(),
   };
+}
+
+/**
+ * "Día de servicio" en formato `YYYY-MM-DD`: la noche de trabajo, no el día
+ * del calendario. El corte va a las 6 de la mañana para que un pedido
+ * entregado a la 1 AM siga perteneciendo a la noche que arrancó a las 19:30.
+ *
+ * Es lo que hace que los códigos de pedido no se agoten nunca: solo tienen que
+ * ser únicos dentro de una noche, así que se reciclan todos los días.
+ */
+export function diaServicio(ts: number = Date.now()) {
+  const desplazado = new Date(
+    ts + OFFSET_ARGENTINA_MIN * 60_000 - CORTE_DIA_SERVICIO_H * 3_600_000,
+  );
+  const anio = desplazado.getUTCFullYear();
+  const mes = String(desplazado.getUTCMonth() + 1).padStart(2, "0");
+  const dia = String(desplazado.getUTCDate()).padStart(2, "0");
+  return `${anio}-${mes}-${dia}`;
 }
 
 export function estaAbierto(horario: HorarioLocal, ts: number = Date.now()) {

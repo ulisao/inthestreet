@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useCarrito, useCarritoHidratado } from "@/lib/pedido/store";
 import { guardarCodigo } from "@/lib/pedido/codigoGuardado";
+import { armarReferencia } from "@/lib/pedido/referencia";
 import { normalizarTelefono, precio } from "@/lib/formato";
 import { estadoApertura } from "@/lib/horario";
 import { useEnLinea } from "@/lib/pwa/useEnLinea";
@@ -137,9 +138,12 @@ export default function PaginaCheckout() {
         })),
       });
 
-      guardarCodigo(resultado.codigo);
+      // La referencia lleva el día adentro: el link sigue sirviendo aunque el
+      // código corto se recicle en una noche futura.
+      const referencia = armarReferencia(resultado.codigo, resultado.diaServicio);
+      guardarCodigo(referencia);
       vaciar();
-      router.push(`/pedido/${resultado.codigo}`);
+      router.push(`/pedido/${referencia}`);
     } catch (error) {
       setErrorGeneral(traducirErrorPedido(error));
       setEnviando(false);

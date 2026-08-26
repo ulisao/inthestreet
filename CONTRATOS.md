@@ -51,7 +51,6 @@ Los precios van en `font-display` sobre `text-cheddar`. **No hay monoespaciada.*
 | Clase | Qué hace |
 |---|---|
 | `.titular-outline` | Elemento firma: palabra en contorno hueso sin relleno. Con `data-relleno="true"` se rellena de rojo en 200ms. Agregá `.titular-outline-grueso` para stroke de 3px. |
-| `.filetes` | Filetes verticales de 1px en hueso partiendo el contenedor en cuatro. Va en un div absoluto sobre el hero. |
 | `.sticker` | Chip die-cut: borde hueso 2px, sombra dura, sin blur. `data-activo="true"` lo pinta rojo. |
 | `.papel-deli` | Fondo de papel a cuadros. Superficie clara: el texto va en negro. |
 | `.borde-duro` | Borde 2px tinta + sombra dura 4px. Para tarjetas. |
@@ -83,12 +82,12 @@ cocción y extras.
 Índice: `por_categoria`.
 
 ### `pedidos`
-`codigo: string` (ej. `A-47`) · `estado` · `modalidad: "retiro" | "delivery"` · `nombre`
+`codigo: string` (ej. `A-47`, **único solo dentro de su día de servicio**) · `diaServicio?: string` (`YYYY-MM-DD`, corte a las 6 AM) · `estado` · `modalidad: "retiro" | "delivery"` · `nombre`
 · `telefono` · `direccion?` · `referencia?` · `metodoPago: "efectivo" | "transferencia"`
 · `pagaCon?: number` · `nota?` · `subtotal` · `recargoDelivery` · `total` · `creadoEn: number`
 · `enCocinaEn?` `listoEn?` `enCaminoEn?` `entregadoEn?` `canceladoEn?` (sellos de tiempo)
 · `motivoCancelacion?` · `minutosEstimados: number` · `pedidosEnColaAlCrear: number`
-Índices: `por_codigo`, `por_estado`, `por_creado`.
+Índices: `por_codigo`, `por_dia_codigo` (el que se usa para buscar), `por_estado`, `por_creado`.
 
 `minutosEstimados` se **congela al crear el pedido**. No se recalcula después: la promesa que
 se le hizo al cliente no cambia.
@@ -149,7 +148,7 @@ Etiquetas de cara al cliente (exportadas en `types/index.ts` como `ETIQUETA_ESTA
 | `api.config.promoDeHoy` | `{ diaSemana: number }` | la promo del día o `null` |
 | `api.config.listarPromos` | — | todas las promos, ordenadas por día |
 | `api.pedidos.eta` | — | `{ enCola, minutos, minutosBase }` — **el ETA honesto** |
-| `api.pedidos.porCodigo` | `{ codigo: string }` | `{ pedido, items, adelante, local } \| null` |
+| `api.pedidos.porCodigo` | `{ codigo: string, diaServicio?: string }` — sin `diaServicio` resuelve contra la noche de hoy | `{ pedido, items, adelante, local } \| null` |
 | `api.pedidos.activos` | — | pedidos en estado activo **con sus `items` embebidos**, ordenados por `creadoEn` |
 | `api.pedidos.cerradosDeHoy` | — | entregados y cancelados de las últimas 12 h |
 
@@ -157,7 +156,7 @@ Etiquetas de cara al cliente (exportadas en `types/index.ts` como `ETIQUETA_ESTA
 
 | Función | Args | Notas |
 |---|---|---|
-| `api.pedidos.crear` | `{ nombre, telefono, modalidad, direccion?, referencia?, metodoPago, pagaCon?, nota?, items: [{ productoId, cantidad, puntoCoccion?, extras: string[], quitar: string[], nota? }] }` | Devuelve `{ codigo, pedidoId }`. **Los precios se recalculan en el servidor.** El cliente manda solo la selección. |
+| `api.pedidos.crear` | `{ nombre, telefono, modalidad, direccion?, referencia?, metodoPago, pagaCon?, nota?, items: [{ productoId, cantidad, puntoCoccion?, extras: string[], quitar: string[], nota? }] }` | Devuelve `{ codigo, diaServicio, pedidoId }`. **Los precios se recalculan en el servidor.** El cliente manda solo la selección. |
 | `api.pedidos.avanzarEstado` | `{ pedidoId, estado }` | Sella el timestamp correspondiente |
 | `api.pedidos.cancelar` | `{ pedidoId, motivo? }` | |
 | `api.config.guardarConfig` | todos los campos opcionales | Patch parcial; crea la fila si no existe |

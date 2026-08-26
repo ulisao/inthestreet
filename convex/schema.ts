@@ -61,7 +61,13 @@ export default defineSchema({
   }).index("por_categoria", ["categoriaSlug"]),
 
   pedidos: defineTable({
+    // Único dentro de un día de servicio, no para siempre: se recicla cada
+    // noche. Así el pool de códigos cortos no se agota nunca.
     codigo: v.string(),
+    // `YYYY-MM-DD` de la noche a la que pertenece el pedido (corte a las 6 AM).
+    // Opcional solo por los pedidos creados antes de que existiera el campo:
+    // todo pedido nuevo lo escribe siempre.
+    diaServicio: v.optional(v.string()),
     estado: estadoPedido,
     modalidad: modalidad,
     nombre: v.string(),
@@ -87,6 +93,9 @@ export default defineSchema({
     pedidosEnColaAlCrear: v.number(),
   })
     .index("por_codigo", ["codigo"])
+    // El que importa para buscar un pedido: el código solo desambigua dentro
+    // de su noche.
+    .index("por_dia_codigo", ["diaServicio", "codigo"])
     .index("por_estado", ["estado"])
     .index("por_creado", ["creadoEn"]),
 

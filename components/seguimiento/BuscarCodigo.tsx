@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { normalizarCodigo } from "./normalizarCodigo";
+import { armarReferencia, leerReferencia } from "@/lib/pedido/referencia";
 import { useCodigosGuardados } from "./useAlmacenPedidos";
 
 /**
@@ -18,9 +18,17 @@ export function BuscarCodigo() {
 
   function buscar(evento: FormEvent) {
     evento.preventDefault();
-    const normalizado = normalizarCodigo(valor);
-    if (!normalizado) return;
-    router.push(`/pedido/${normalizado}`);
+    const referencia = leerReferencia(valor);
+    if (!referencia) return;
+    // Sin día, se resuelve contra la noche de hoy: es cuando el pedido que
+    // alguien está buscando a mano sigue vivo.
+    router.push(
+      `/pedido/${
+        referencia.diaServicio
+          ? armarReferencia(referencia.codigo, referencia.diaServicio)
+          : referencia.codigo
+      }`,
+    );
   }
 
   return (
@@ -62,14 +70,16 @@ export function BuscarCodigo() {
             Tus pedidos guardados
           </p>
           <ul className="flex flex-wrap gap-2">
-            {codigosGuardados.map((codigo) => (
-              <li key={codigo}>
+            {/* Se guarda la referencia completa, pero se muestra el código
+                corto: es el que el cliente reconoce y el que canta la cocina. */}
+            {codigosGuardados.map((referencia) => (
+              <li key={referencia}>
                 <button
                   type="button"
-                  onClick={() => router.push(`/pedido/${codigo}`)}
+                  onClick={() => router.push(`/pedido/${referencia}`)}
                   className="sticker min-h-11 px-4 font-display uppercase"
                 >
-                  {codigo}
+                  {leerReferencia(referencia)?.codigo ?? referencia}
                 </button>
               </li>
             ))}
